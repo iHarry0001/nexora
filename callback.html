@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Conectando · Nexora</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .box { max-width: 520px; margin: 80px auto; text-align: center; padding: 0 16px; }
+    .box .logo { width: 64px; height: 64px; font-size: 2rem; border-radius: 16px; margin: 0 auto 18px; }
+    .err { color: #ff8a8a; }
+    code { background: #182238; padding: 2px 6px; border-radius: 6px; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <div class="logo">N</div>
+    <h1 id="title">Conectando ao Nexora…</h1>
+    <p id="msg" class="meta">Você será redirecionado para o Nexora no seu computador.</p>
+    <p id="manual" style="display:none"><a id="link" href="#">Clique aqui se não for redirecionado</a></p>
+  </div>
+
+  <script>
+    // ====== CONFIGURE AQUI ======
+    // Endereço do Nexora rodando no seu computador + rota que recebe o callback do TikTok.
+    var NEXORA_LOCAL_CALLBACK = "http://localhost:8000/api/tiktok/callback";
+    // ============================
+
+    (function () {
+      var params = new URLSearchParams(window.location.search);
+      var title = document.getElementById("title");
+      var msg = document.getElementById("msg");
+
+      if (params.get("error")) {
+        title.textContent = "Conexão cancelada";
+        title.className = "err";
+        msg.textContent = "O TikTok retornou: " + (params.get("error_description") || params.get("error")) +
+          ". Volte ao Nexora e tente novamente.";
+        return;
+      }
+
+      if (!params.get("code")) {
+        title.textContent = "Nada para processar";
+        msg.innerHTML = "Esta página só é usada durante a conexão da conta do TikTok com o Nexora. " +
+          "<a href='index.html'>Voltar ao início</a>";
+        return;
+      }
+
+      // Repassa code, scopes e state exatamente como vieram do TikTok.
+      var target = NEXORA_LOCAL_CALLBACK + window.location.search;
+      var link = document.getElementById("link");
+      link.href = target;
+      document.getElementById("manual").style.display = "block";
+      window.location.replace(target);
+    })();
+  </script>
+</body>
+</html>
